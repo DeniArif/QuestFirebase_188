@@ -1,41 +1,45 @@
 package com.example.myapplication.repository
 
-import android.app.DownloadManager.Query
 import com.example.myapplication.model.Mahasiswa
-import kotlinx.coroutines.awaitAll
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+
 
 class NetworkMahasiswaRepository (
     private val firestore: FirebaseFirestore
-
-): MahasiswaRepository{
-    override suspend fun getAllMahasiswa(): Flow<List<Mahasiswa>> {
+):MahasiswaRepository
+{
+    override suspend fun getAllMahasiswa(): Flow<List<Mahasiswa>> = callbackFlow {
         val mhsCollection = firestore.collection("mahasiswa")
-            .orderby("nim", Query.Direction.DECENDING)
-            .addSnapshotListener{ value, error ->
-
-                if (value != null){
-                    val mhsList = value.documents.{
+            .orderBy("nim", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
+                if (value != null) {
+                    val mhsList = value.documents.mapNotNull {
                         it.toObject(Mahasiswa::class.java)!!
                     }
                     trySend(mhsList)
                 }
             }
-        awaitClose() {
+        awaitClose {
             mhsCollection.remove()
         }
     }
-
     override suspend fun insertMahasiswa(mahasiswa: Mahasiswa) {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateMahasiswa(nim: String) {
+    override suspend fun updateMahasiswa(nim: String, mahasiswa: Mahasiswa) {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteMahasiswa() {
+    override suspend fun deleteMahasiswa(nim: String) {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getMahasiswabyNim(nim: String): Mahasiswa {
+        TODO("Not yet implemented")
+    }
 }
