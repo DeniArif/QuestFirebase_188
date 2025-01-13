@@ -37,17 +37,14 @@ class NetworkMahasiswaRepository (
             mhsCollection.remove()
         }
     }
-    override suspend fun getMhs(nim: String): Mahasiswa {
-        val mhsDocumented = firestore.collection("Mahasiswa")
-            .document(nim)
-            .addSnapshotListener { value, error ->
-                if (value != null) {
-                    val mhs = value.toObject(Mahasiswa::class.java)!!!
-                    trySend(mhs)
-                }
-            }
-        awaitClose {
-            mhsDocumented.remove()
+    override suspend fun updateMahasiswa(nim: String, mahasiswa: Mahasiswa) {
+        try {
+            firestore.collection("Mahasiswa")
+                .document(mahasiswa.nim)
+                .set(mahasiswa)
+                .await()
+        }catch (e: Exception){
+            throw Exception ("Gagal mengupdate data mahasiswa")
         }
     }
     override suspend fun deleteMhs(mahasiswa: Mahasiswa) {
@@ -60,19 +57,18 @@ class NetworkMahasiswaRepository (
             throw Exception("Gagal menghapus data mahasiswa:")
         }
     }
-    override suspend fun insertMahasiswa(mahasiswa: Mahasiswa) {
-        TODO("Not yet implemented")
+    override suspend fun getMahasiswaByNim(nim: String): Flow<Mahasiswa> = callbackFlow {
+        val mhsDocument = firestore.collection("Mahasiswa")
+            .document(nim)
+            .addSnapshotListener{value, error ->
+                if (value != null){
+                    val mhs = value.toObject(Mahasiswa::class.java)!!
+                    trySend(mhs)
+                }
+            }
+        awaitClose{
+            mhsDocument.remove()
+        }
     }
 
-    override suspend fun updateMahasiswa(nim: String, mahasiswa: Mahasiswa) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteMahasiswa(nim: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getMahasiswabyNim(nim: String): Mahasiswa {
-
-    }
 }
