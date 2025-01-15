@@ -1,5 +1,6 @@
 package com.example.myapplication.viewmodel
 
+import android.nfc.cardemulation.HostNfcFService
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,41 +11,50 @@ import com.example.myapplication.repository.MahasiswaRepository
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlin.Exception
 
-// Status UI buat nampilin kondisi data: sukses, error, atau loading
 sealed class HomeUiState {
-    data class Success(val mahasiswa: List<Mahasiswa>) : HomeUiState() // Kalau data berhasil diambil
-    data class Error(val exception: Throwable) : HomeUiState() // Kalau ada error
-    object Loading : HomeUiState() // Kalau lagi loading
+    data class Success(val mahasiswa: List<Mahasiswa>) : HomeUiState()
+    data class Error(val e: Throwable) : HomeUiState()
+    object Loading : HomeUiState()
+
 }
 class HomeViewModel (
     private val mhs: MahasiswaRepository
-): ViewModel(){
+): ViewModel() {
     var mhsUIState: HomeUiState by mutableStateOf(HomeUiState.Loading)
         private set
 
-    // Langsung ambil data pas ViewModel dibuat
     init {
+
         getMhs()
     }
 
-    // Ambil data mahasiswa dari repository
     fun getMhs() {
-        viewModelScope.launch { // Coroutine biar proses ambil data di background
-            mhs.getAllMahasiswa()
+        viewModelScope.launch {
+            mhs.getMhs()
                 .onStart {
                     mhsUIState = HomeUiState.Loading
                 }
                 .catch {
                     mhsUIState = HomeUiState.Error(it)
                 }
-                .collect{
+                .collect {
                     mhsUIState = if (it.isEmpty()) {
                         HomeUiState.Error(Exception("Belum ada daftar mahasiswa"))
-                    }else{
+                    } else {
                         HomeUiState.Success(it)
                     }
                 }
+        }
+    }
+    fun deleteMhs(mahasiswa: Mahasiswa){
+        viewModelScope.launch {
+            try {
+                mhs.deleteMhs(mahasiswa)
+            } catch (e: Exception) {
+                mhsUIState = HomeUiState.Error(e)
+            }
         }
     }
 }

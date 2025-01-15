@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.viewmodel
 
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,45 +11,48 @@ import com.example.myapplication.repository.MahasiswaRepository
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlin.Exception
 
 sealed class HomeUiState {
     data class Success(val mahasiswa: List<Mahasiswa>) : HomeUiState()
-    data class  Error(val exception: Throwable) : HomeUiState()
-    object  Loading : HomeUiState()
+    data class Error(val e: Throwable) : HomeUiState()
+    object Loading : HomeUiState()
+
 }
 class HomeViewModel (
     private val mhs: MahasiswaRepository
-) : ViewModel() {
+): ViewModel() {
     var mhsUIState: HomeUiState by mutableStateOf(HomeUiState.Loading)
         private set
 
     init {
+
         getMhs()
     }
 
     fun getMhs() {
         viewModelScope.launch {
-            mhs.getAllMahasiswa()
+            mhs.getMhs()
                 .onStart {
                     mhsUIState = HomeUiState.Loading
                 }
                 .catch {
                     mhsUIState = HomeUiState.Error(it)
                 }
-                .collect{
-                    mhsUIState = if (it.isEmpty()){
+                .collect {
+                    mhsUIState = if (it.isEmpty()) {
                         HomeUiState.Error(Exception("Belum ada daftar mahasiswa"))
-                    } else{
+                    } else {
                         HomeUiState.Success(it)
                     }
                 }
         }
     }
-    fun deleteMhs(mahasiswa:Mahasiswa){
+    fun deleteMhs(mahasiswa: Mahasiswa){
         viewModelScope.launch {
             try {
                 mhs.deleteMhs(mahasiswa)
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 mhsUIState = HomeUiState.Error(e)
             }
         }

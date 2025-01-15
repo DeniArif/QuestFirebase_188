@@ -1,21 +1,19 @@
 package com.example.myapplication.repository
 
+
 import com.example.myapplication.model.Mahasiswa
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.tasks.await
 
 interface MahasiswaRepository {
-    // Mengambil daftar semua mahasiswa
-    suspend fun getAllMahasiswa(): Flow<List<Mahasiswa>>
+    suspend fun  getMhs(): Flow<List<Mahasiswa>>
 
-    // Menambahkan data mahasiswa
-    suspend fun insertMahasiswa(mahasiswa: Mahasiswa)
+    suspend fun insertMhs(mahasiswa: Mahasiswa)
 
-    // Memperbarui data mahasiswa berdasarkan NIM
-    suspend fun updateMahasiswa(nim: String, mahasiswa: Mahasiswa)
+    suspend fun updateMhs(nim: String,mahasiswa: Mahasiswa)
 
-    // Menghapus mahasiswa berdasarkan NIM
-    suspend fun deleteMahasiswa(nim: String)
+    suspend fun deleteMhs( mahasiswa: Mahasiswa)
 
-    // Mengambil data mahasiswa berdasarkan NIM
-    suspend fun getMahasiswabyNim(nim: String): Mahasiswa
+    suspend fun getMhsbyNim(nim: String):Flow<Mahasiswa>
 }

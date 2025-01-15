@@ -1,8 +1,8 @@
 package com.example.myapplication.ui.navigasi
 
 import androidx.compose.runtime.Composable
-import com.example.myapplication.view.HomeScreen
-import java.lang.reflect.Modifier
+import androidx.compose.ui.Modifier
+
 
 @Composable
 fun PengelolaHalaman(
@@ -13,19 +13,20 @@ fun PengelolaHalaman(
         navController = navController,
         startDestination = DestinasiHome.route,
         modifier = modifier
-    )  {
+    ) {
         composable(DestinasiHome.route) {
-            HomeScreen(
+            HomeView(
                 navigateToItemEntry = {
                     navController.navigate(DestinasiInsert.route)
                 },
             )
         }
-
         composable(DestinasiInsert.route) {
-            InsertMhsView(
-                onBack = {navController.popBackStack()},
-                onNavigate = {navController.navigate(DestinasiHome.route)}
+            InsertMahasiswaView(
+                onBack = { navController.popBackStack() },
+                onNavigate = {
+                    navController.navigate(DestinasiHome.route)
+                }
             )
         }
     }

@@ -1,13 +1,11 @@
-package com.example.myapplication.ui.viewmodel
+package com.example.myapplication.viewmodel
 
 import androidx.compose.runtime.getValue
-import com.example.myapplication.model.Mahasiswa
-
-
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.model.Mahasiswa
 import com.example.myapplication.repository.MahasiswaRepository
 
 import kotlinx.coroutines.launch
@@ -38,7 +36,7 @@ class InsertViewModel(
             angkatan = if (event.angkatan.isNotEmpty()) null else "Angkatan tidak boleh kosong",
             judulskripsi = if (event.judulskripsi.isNotEmpty()) null else "Judul Skripsi tidak boleh kosong",
             dosenpem1 = if (event.dosenpem1.isNotEmpty()) null else "Dosen Pembimbing tidak boleh kosong",
-            dosenpem2 = if (event.dosenpem2.isNotEmpty()) null else "Dosen Pembimbing tidak boleh kosong",
+            deosenpem2 = if (event.dosenpem2.isNotEmpty()) null else "Dosen Pembimbing tidak boleh kosong",
 
             )
         uiEvent = uiEvent.copy(isEntryValid = errorState)
@@ -90,11 +88,12 @@ data class FormErrorState(
     val angkatan: String? = null,
     val judulskripsi: String? = null,
     val dosenpem1: String? = null,
-    val dosenpem2: String? = null
+    val deosenpem2: String? = null
+
 ){
     fun isValid(): Boolean{
         return nim == null && nama == null && jenis_kelamin == null &&
-                alamat == null && kelas == null && angkatan == null && judulskripsi == null && dosenpem1 == null && dosenpem2 == null
+                alamat == null && kelas == null && angkatan == null && judulskripsi == null && dosenpem1 == null && deosenpem2== null
     }
 }
 
@@ -119,7 +118,7 @@ fun MahasiswaEvent.toMhsModel(): Mahasiswa = Mahasiswa(
     alamat = alamat,
     kelas = kelas,
     angkatan = angkatan,
-    judulskripsi =  judulskripsi,
+    judulskripsi = judulskripsi,
     dosenpem1 = dosenpem1,
     dosenpem2 = dosenpem2
 )
